@@ -1,0 +1,80 @@
+#include <iostream>
+#include <string>
+#include <vector>
+#include <algorithm>
+#include <map>
+#include <cctype>
+
+using namespace std;
+
+// Частоти англійських літер (у відсотках)
+map<char, double> englishFrequencies = {
+    {'A', 8.08}, {'B', 1.67}, {'C', 3.18}, {'D', 3.99}, {'E', 12.56},
+    {'F', 2.17}, {'G', 1.80}, {'H', 5.27}, {'I', 7.24}, {'J', 0.14},
+    {'K', 0.63}, {'L', 4.04}, {'M', 2.60}, {'N', 7.38}, {'O', 7.47},
+    {'P', 1.91}, {'Q', 0.09}, {'R', 6.42}, {'S', 6.59}, {'T', 9.15},
+    {'U', 2.79}, {'V', 1.00}, {'W', 1.89}, {'X', 0.21}, {'Y', 1.65},
+    {'Z', 0.07}
+};
+
+// Допоміжна функція для підрахунку частоти літер у повідомленні
+map<char, int> countFrequencies(const string& message) {
+    map<char, int> frequencies;
+    for (char c : message) {
+        if (isalpha(c)) {
+            c = toupper(c); //Робота з великими літерами для підрахунку частоти
+            frequencies[c]++;
+        }
+    }
+    return frequencies;
+}
+
+// Функція пошуку найчастішої літери в закодованому повідомленні
+char findMostFrequentLetter(const map<char, int>& frequencies) {
+    char mostFrequent = '\0';
+    int maxCount = 0;
+    for (auto& entry : frequencies) {
+        if (entry.second > maxCount) {
+            mostFrequent = entry.first;
+            maxCount = entry.second;
+        }
+    }
+    return mostFrequent;
+}
+
+// Функція декодування повідомлення з заданим зсувом
+string decodeMessage(const string& message, int shift) {
+    string decodedMessage;
+    for (char c : message) {
+        if (isalpha(c)) {
+            char base = isupper(c) ? 'A' : 'a';
+            char decodedChar = (c - base - shift + 26) % 26 + base;
+            decodedMessage += decodedChar;
+        } else {
+            decodedMessage += c; 
+        }
+    }
+    return decodedMessage;
+}
+
+int main() {
+    string message;
+    getline(cin, message);
+
+    // Підрахунок частоти літер у повідомленні
+    map<char, int> frequencies = countFrequencies(message);
+
+    // Найчастіша літера в закодованому повідомленні
+    char mostFrequentLetter = findMostFrequentLetter(frequencies);
+
+    // Оцінка зсуву, порівнюючи з очікуваною частотою «E»
+    int shift = (toupper(mostFrequentLetter) - 'E' + 26) % 26;
+
+    // Декодування
+    string decodedMessage = decodeMessage(message, shift);
+
+    // Розшифрване повідомлення
+    cout << decodedMessage << endl;
+
+    return 0;
+}
